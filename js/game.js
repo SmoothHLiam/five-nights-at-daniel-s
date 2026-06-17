@@ -264,6 +264,19 @@ function bindOfficeControls(){
   };
   $(".pan-left").onclick = ()=> setPan(-1);
   $(".pan-right").onclick = ()=> setPan(1);
+
+  // swipe up to raise monitor, swipe down to lower it
+  let _sy=null, _sx=null;
+  vp.addEventListener("pointerdown", e=>{ _sy=e.clientY; _sx=e.clientX; });
+  vp.addEventListener("pointerup", e=>{
+    if(_sy===null || !S || S.over || S.won || S.powerOut){ _sy=_sx=null; return; }
+    const dy=_sy-e.clientY, dx=Math.abs(e.clientX-_sx);
+    _sy=_sx=null;
+    if(Math.abs(dy)<70 || Math.abs(dy)<dx*1.5) return; // must be mostly vertical
+    if(dy>0 && !S.camUp) openMonitor();
+    else if(dy<0 && S.camUp) closeMonitor();
+  });
+  vp.addEventListener("pointercancel",()=>{ _sy=_sx=null; });
 }
 
 function setPan(dir){
@@ -361,30 +374,38 @@ function switchCam(id){
     el.classList.toggle("active", el.dataset.cam===id);
     el.classList.remove("here");
   });
-  // render any monster standing in this room
+  // render any monsters standing in this room, side by side
   if(!r.audio){
+    const present=[];
     for(const k in S.monsters){
       const m=S.monsters[k]; const role=CHARACTERS[k].role;
       let roomHere=null;
       if(role==="cove"){
-        roomHere = (m.cove<3 && !m.running) ? "1C" : null;
+        roomHere=(m.cove<3 && !m.running)?"1C":null;
       }else{
         const path=PATHS[role];
         const node=path[m.pos];
         if(node && ROOMS[node]) roomHere=node;
       }
-      if(roomHere===id){
-        const mon=document.createElement("div");
-        mon.className="cam-monster";
-        mon.style.backgroundImage=`url('${CHARACTERS[k].img}')`;
-        // cove peeking partly hidden
-        mon.style.width = role==="cove" ? "40%" : "55%";
-        if(role==="cove" && m.cove===1) mon.style.opacity=".5";
-        img.appendChild(mon);
-        const cell=$$(".map-room").find(e=>e.dataset.cam===id);
-        if(cell) cell.classList.add("here");
-      }
+      if(roomHere===id) present.push({k,m,role});
     }
+    const n=present.length;
+    present.forEach(({k,m,role},i)=>{
+      const mon=document.createElement("div");
+      mon.className="cam-monster";
+      mon.style.backgroundImage=`url('${CHARACTERS[k].img}')`;
+      // size: shrink as more monsters share the frame
+      const w = role==="cove" ? 40 : n===1 ? 55 : n===2 ? 38 : 28;
+      mon.style.width=`${w}%`;
+      // distribute evenly across the feed width
+      const leftPct=((i+1)/(n+1))*100;
+      mon.style.left=`${leftPct}%`;
+      mon.style.transform="translateX(-50%)";
+      if(role==="cove" && m.cove===1) mon.style.opacity=".5";
+      img.appendChild(mon);
+      const cell=$$(".map-room").find(e=>e.dataset.cam===id);
+      if(cell) cell.classList.add("here");
+    });
   }
 }
 
