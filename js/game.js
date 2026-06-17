@@ -641,7 +641,14 @@ window.addEventListener("DOMContentLoaded", ()=>{
   bindNav();
   show("menu");
   // keyboard: space toggles cams, A/D pan, arrows for doors
+  const _held = new Set();
   document.addEventListener("keydown", e=>{
+    _held.add(e.code);
+    // debug skip: C + D + NumpadAdd -> jump to 6 AM (original FNAF cheat)
+    if(_held.has("KeyC") && _held.has("KeyD") && _held.has("NumpadAdd")){
+      if(S && !S.over && !S.won) winNight();
+      return;
+    }
     if(!S || S.over || S.won) return;
     if(e.code==="Space"){ e.preventDefault(); S.camUp?closeMonitor():openMonitor(); }
     if(!S.camUp){
@@ -654,6 +661,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
       if(e.key==="c") flickLight("right");
     }
   });
+  document.addEventListener("keyup", e=>{ _held.delete(e.code); });
 });
 
 })();
