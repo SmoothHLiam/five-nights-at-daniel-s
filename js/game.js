@@ -120,12 +120,18 @@ const save = {
   set maxUnlocked(v){ localStorage.setItem("fbad_unlocked", Math.max(this.maxUnlocked,v)); },
   get beat6(){ return localStorage.getItem("fbad_beat6")==="1"; },
   set beat6(v){ if(v) localStorage.setItem("fbad_beat6","1"); },
+  get customUnlocked(){ return localStorage.getItem("fbad_custom")==="1"; },
+  set customUnlocked(v){ if(v) localStorage.setItem("fbad_custom","1"); },
 };
+
+/* last-chosen Custom Night (Night 7) A.I. levels, 0..20 each */
+let customAI = { daniel:0, bruno:0, cole:0, jett:0 };
 
 let S = null; // active game state, created per night
 
-function freshState(night){
-  const ai = JSON.parse(JSON.stringify(NIGHT_AI[night] || NIGHT_AI[5]));
+function freshState(night, custom){
+  const ai = custom ? {...custom}
+                    : JSON.parse(JSON.stringify(NIGHT_AI[night] || NIGHT_AI[5]));
   // small random night-4 bump like the original
   if(night===4){ if(Math.random()<0.5) ai.bruno++; if(Math.random()<0.5) ai.daniel++; }
   return {
@@ -171,6 +177,10 @@ function buildMenu(){
   const cont = $('.menu-list li[data-action="continue"]');
   if(save.maxUnlocked<=1) cont.classList.add("disabled"); else cont.classList.remove("disabled");
 
+  // Custom Night (Night 7) appears only after the Bonus Night is beaten
+  const cn = $('.menu-list li[data-action="customnight"]');
+  if(cn) cn.classList.toggle("disabled", !save.customUnlocked);
+
   $$(".menu-list li").forEach(li=>{
     li.onclick = () => {
       if(li.classList.contains("disabled")) return;
@@ -179,9 +189,39 @@ function buildMenu(){
       if(a==="new"){ startNight(1); }
       else if(a==="continue"){ startNight(save.maxUnlocked); }
       else if(a==="custom"){ buildNightSelect(); show("nightselect"); }
+      else if(a==="customnight"){ buildCustomNight(); show("customnight"); }
       else if(a==="howto"){ show("howto"); }
     };
   });
+}
+
+/* Custom Night (Night 7): pick each monster's A.I. level 0..20, like the original */
+function buildCustomNight(){
+  const wrap=$("#custom-cards"); wrap.innerHTML="";
+  ["daniel","bruno","cole","jett"].forEach(key=>{
+    const c=CHARACTERS[key];
+    const card=document.createElement("div");
+    card.className="cc-card";
+    card.innerHTML=`
+      <div class="cc-name">${c.name}</div>
+      <div class="cc-portrait" style="background-image:url('${c.img}')"></div>
+      <div class="cc-ailabel">A.I. Level</div>
+      <div class="cc-controls">
+        <button class="cc-arrow" data-d="-1">&lsaquo;</button>
+        <span class="cc-level" id="lvl-${key}">${customAI[key]}</span>
+        <button class="cc-arrow" data-d="1">&rsaquo;</button>
+      </div>`;
+    const span=card.querySelector(".cc-level");
+    card.querySelectorAll(".cc-arrow").forEach(b=>{
+      b.onclick=()=>{
+        Sound.blip();
+        customAI[key]=Math.max(0, Math.min(20, customAI[key] + (+b.dataset.d)));
+        span.textContent=customAI[key];
+      };
+    });
+    wrap.appendChild(card);
+  });
+  $("#custom-ready").onclick=()=>{ Sound.resume(); Sound.blip(); startNight(7, {...customAI}); };
 }
 function buildNightSelect(){
   const wrap=$("#night-buttons"); wrap.innerHTML="";
@@ -204,9 +244,11 @@ function bindNav(){
 /* =================================================================
    NIGHT START
    ================================================================= */
-function startNight(night){
+function startNight(night, custom){
   stopGame();
-  S = freshState(night);
+  // Night 7 always uses the Custom Night levels (even on retry)
+  if(night===7 && !custom) custom = {...customAI};
+  S = freshState(night, custom);
   $("#intro-num").textContent = night;
   show("intro");
   setTimeout(()=>{ if(S) beginPlay(); }, 2200);
@@ -597,12 +639,19 @@ function winNight(){
   Sound.sixAM();
   closeMonitor();
   const next = S.night+1;
-  save.maxUnlocked = Math.min(next, 6);
+  if(S.night<=5) save.maxUnlocked = Math.min(next, 6);
   if(S.night>=5) Sound.chime();
   if(S.night===5){ save.beat6=true; }
-  $("#win-msg").textContent = S.night>=6 ? "You beat the Bonus Night!"
-                            : S.night>=5 ? "You survived the week!"
-                            : "Night Complete";
+  if(S.night===6){ save.customUnlocked=true; } // beating Bonus Night unlocks Custom Night
+  if(S.night>=7){
+    const all20 = Object.values(S.ai).every(v=>v>=20);
+    $("#win-msg").textContent = all20 ? "4/20 MODE BEATEN — Legendary."
+                                      : "Custom Night Complete!";
+  }else{
+    $("#win-msg").textContent = S.night>=6 ? "You beat the Bonus Night!"
+                              : S.night>=5 ? "You survived the week!"
+                              : "Night Complete";
+  }
   setTimeout(()=>show("win"), 1500);
 }
 

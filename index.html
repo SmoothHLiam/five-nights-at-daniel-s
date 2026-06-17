@@ -18,6 +18,7 @@
         <li data-action="new">New Game</li>
         <li data-action="continue">Continue</li>
         <li data-action="custom">Night Select</li>
+        <li data-action="customnight" class="disabled">Custom Night</li>
         <li data-action="howto">How To Play</li>
       </ul>
       <p class="menu-credit">A fan-made parody &mdash; original code &amp; art</p>
@@ -28,6 +29,15 @@
   <section id="nightselect" class="screen">
     <h2 class="screen-title">Select Night</h2>
     <div id="night-buttons" class="night-buttons"></div>
+    <button class="back-btn" data-action="back-menu">&larr; Back</button>
+  </section>
+
+  <!-- ===================== CUSTOM NIGHT (NIGHT 7) ===================== -->
+  <section id="customnight" class="screen">
+    <h2 class="screen-title cn-title">Customize Night</h2>
+    <div id="custom-cards" class="custom-cards"></div>
+    <p class="custom-legend">(0-2) easy &nbsp; (3-6) med &nbsp; (7-12) hard &nbsp; (13-20) extreme</p>
+    <button class="ready-btn" id="custom-ready">READY</button>
     <button class="back-btn" data-action="back-menu">&larr; Back</button>
   </section>
 
