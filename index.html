@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Five Birthdays at Daniel's</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="game">
+
+  <!-- ===================== MAIN MENU ===================== -->
+  <section id="menu" class="screen active">
+    <div class="menu-static"></div>
+    <div class="menu-content">
+      <h1 class="title">Five Birthdays<br><span class="title-sub">at Daniel's</span></h1>
+      <ul class="menu-list">
+        <li data-action="new">New Game</li>
+        <li data-action="continue">Continue</li>
+        <li data-action="custom">Night Select</li>
+        <li data-action="howto">How To Play</li>
+      </ul>
+      <p class="menu-credit">A fan-made parody &mdash; original code &amp; art</p>
+    </div>
+  </section>
+
+  <!-- ===================== NIGHT SELECT ===================== -->
+  <section id="nightselect" class="screen">
+    <h2 class="screen-title">Select Night</h2>
+    <div id="night-buttons" class="night-buttons"></div>
+    <button class="back-btn" data-action="back-menu">&larr; Back</button>
+  </section>
+
+  <!-- ===================== HOW TO ===================== -->
+  <section id="howto" class="screen">
+    <h2 class="screen-title">How To Play</h2>
+    <div class="howto-text">
+      <p>Survive from <b>12 AM to 6 AM</b>. Monsters wander the building and try to reach your office.</p>
+      <ul>
+        <li><b>Cameras</b> &mdash; pull up the monitor (bottom button) to watch the rooms and track the monsters.</li>
+        <li><b>Doors</b> &mdash; close the left / right door to block a monster that's right outside. Closed doors and lights drain power.</li>
+        <li><b>Lights</b> &mdash; flick the door lights to check the blind spot just outside each door.</li>
+        <li><b>Power</b> &mdash; you have limited power each night. Run out and you're defenceless in the dark&hellip;</li>
+        <li><b>Daniel</b> only moves while you're <i>not</i> watching him on the cameras. Keep an eye out.</li>
+        <li>Watch <b>Pirate Cove</b> &mdash; if you ignore it, something will come sprinting down the west hall.</li>
+      </ul>
+    </div>
+    <button class="back-btn" data-action="back-menu">&larr; Back</button>
+  </section>
+
+  <!-- ===================== NIGHT INTRO ===================== -->
+  <section id="intro" class="screen">
+    <div class="intro-night">Night <span id="intro-num">1</span></div>
+    <div class="intro-time">12 AM</div>
+  </section>
+
+  <!-- ===================== GAMEPLAY ===================== -->
+  <section id="play" class="screen">
+
+    <!-- The office (pannable) -->
+    <div id="office-viewport">
+      <div id="office">
+        <!-- left door zone -->
+        <div class="door-zone left">
+          <div class="hall-light left-hall"></div>
+          <div class="doorway left-doorway">
+            <div class="door-blind left-blind"><div class="monster-peek" id="peek-left"></div></div>
+            <div class="door-panel left-panel" id="left-door-panel"></div>
+          </div>
+          <div class="door-controls left-controls">
+            <button class="dc-btn door-btn" id="btn-left-door"><span>DOOR</span></button>
+            <button class="dc-btn light-btn" id="btn-left-light"><span>LIGHT</span></button>
+          </div>
+        </div>
+
+        <!-- center desk -->
+        <div class="office-center">
+          <div class="window-back"></div>
+          <div class="desk">
+            <div class="fan"><div class="fan-blades"></div><div class="fan-cage"></div></div>
+            <div class="poster">CELEBRATE!<br><span>Daniel &amp; Friends</span></div>
+          </div>
+        </div>
+
+        <!-- right door zone -->
+        <div class="door-zone right">
+          <div class="hall-light right-hall"></div>
+          <div class="doorway right-doorway">
+            <div class="door-blind right-blind"><div class="monster-peek" id="peek-right"></div></div>
+            <div class="door-panel right-panel" id="right-door-panel"></div>
+          </div>
+          <div class="door-controls right-controls">
+            <button class="dc-btn door-btn" id="btn-right-door"><span>DOOR</span></button>
+            <button class="dc-btn light-btn" id="btn-right-light"><span>LIGHT</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- pan hint arrows -->
+    <div class="pan-zone pan-left"></div>
+    <div class="pan-zone pan-right"></div>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-time"><span id="hud-hour">12</span> AM</div>
+      <div class="hud-power">
+        <div class="power-label">Power left: <span id="power-pct">100</span>%</div>
+        <div class="power-usage">Usage: <span id="usage-bars"></span></div>
+      </div>
+      <div class="hud-night">Night <span id="hud-night-num">1</span></div>
+    </div>
+
+    <!-- Camera monitor overlay -->
+    <div id="monitor">
+      <div class="cam-feed">
+        <div class="cam-static"></div>
+        <div class="cam-image" id="cam-image"></div>
+        <div class="cam-label" id="cam-label">CAM 1A</div>
+        <div class="cam-recording"><span class="rec-dot"></span> REC</div>
+        <div class="cam-title" id="cam-title">Show Stage</div>
+      </div>
+      <div class="cam-map" id="cam-map"></div>
+    </div>
+
+    <!-- Camera toggle flip bar -->
+    <div id="cam-flip"><div class="flip-arrow">&#9650;</div><span>CAMERAS</span></div>
+
+    <!-- power-out / jumpscare layers -->
+    <div id="blackout"></div>
+    <div id="jumpscare"></div>
+  </section>
+
+  <!-- ===================== WIN / 6AM ===================== -->
+  <section id="win" class="screen">
+    <div class="win-time">6 AM</div>
+    <div class="win-msg" id="win-msg">Night Complete</div>
+    <button class="menu-btn" data-action="win-continue">Continue</button>
+  </section>
+
+  <!-- ===================== GAME OVER ===================== -->
+  <section id="gameover" class="screen">
+    <div class="go-static"></div>
+    <button class="menu-btn" data-action="retry">Retry Night</button>
+    <button class="menu-btn ghost" data-action="back-menu">Main Menu</button>
+  </section>
+
+</div>
+<script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,340 @@
+/* ===================================================================
+   Five Birthdays at Daniel's  --  original styling / "office" aesthetic
+   =================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root{
+  --amber:#e0a73c;
+  --red:#c43b2b;
+  --dark:#0a0a0c;
+  --panel:#15151a;
+}
+
+html,body{
+  height:100%;
+  background:#000;
+  color:#cfcfcf;
+  font-family:"Courier New",Courier,monospace;
+  overflow:hidden;
+  user-select:none;
+}
+
+#game{
+  position:fixed;
+  inset:0;
+  background:#000;
+}
+
+.screen{ display:none; position:absolute; inset:0; }
+.screen.active{ display:block; }
+
+/* ---------- shared static / noise ---------- */
+@keyframes flicker { 0%,100%{opacity:.10} 50%{opacity:.18} }
+@keyframes staticmove { 0%{background-position:0 0} 100%{background-position:0 100%} }
+.menu-static,.cam-static,.go-static,.menu-static{
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 2px, transparent 2px 4px);
+  animation:staticmove .4s steps(8) infinite, flicker 3s infinite;
+  mix-blend-mode:screen;
+}
+
+/* =================== MAIN MENU =================== */
+#menu{ background:radial-gradient(circle at 50% 30%, #18120b 0%, #050505 70%); }
+.menu-content{ position:absolute; inset:0; padding:8vh 8vw; }
+.title{
+  font-family:"Arial Black",Impact,sans-serif;
+  font-size:min(11vw,90px);
+  font-weight:900;
+  color:#d7d2c8;
+  line-height:.95;
+  letter-spacing:2px;
+  text-shadow:0 0 18px rgba(224,167,60,.25), 3px 3px 0 #000;
+  animation:titleflick 5s infinite;
+}
+@keyframes titleflick{ 0%,97%,100%{opacity:1} 98%{opacity:.4} 99%{opacity:.85} }
+.title-sub{ color:var(--amber); font-size:.82em; }
+.menu-list{ list-style:none; margin-top:7vh; }
+.menu-list li{
+  font-size:min(6vw,34px);
+  color:#9a958b;
+  padding:6px 0;
+  width:max-content;
+  cursor:pointer;
+  transition:.12s;
+}
+.menu-list li:hover{ color:#fff; transform:translateX(10px); text-shadow:0 0 10px var(--amber); }
+.menu-list li.disabled{ opacity:.3; cursor:not-allowed; }
+.menu-list li.disabled:hover{ color:#9a958b; transform:none; text-shadow:none; }
+.menu-credit{ position:absolute; bottom:4vh; left:8vw; font-size:13px; color:#5a564e; }
+
+/* =================== SUB SCREENS =================== */
+#nightselect,#howto{ background:#070707; padding:7vh 8vw; }
+.screen-title{ font-size:34px; color:var(--amber); margin-bottom:30px; letter-spacing:3px; }
+.night-buttons{ display:flex; gap:18px; flex-wrap:wrap; }
+.night-buttons button{
+  width:120px; height:120px; font-size:22px; color:#ddd;
+  background:#141414; border:2px solid #333; border-radius:8px; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+}
+.night-buttons button .nlbl{ font-size:13px; color:#888; }
+.night-buttons button:hover:not(:disabled){ border-color:var(--amber); color:#fff; }
+.night-buttons button:disabled{ opacity:.3; cursor:not-allowed; }
+.howto-text{ max-width:760px; line-height:1.7; font-size:16px; color:#bdbdbd; }
+.howto-text ul{ margin:14px 0 0 22px; }
+.howto-text li{ margin:8px 0; }
+.howto-text b{ color:var(--amber); }
+.back-btn{
+  position:absolute; bottom:5vh; left:8vw; background:none; border:2px solid #444;
+  color:#bbb; padding:10px 22px; font-size:16px; cursor:pointer; font-family:inherit;
+}
+.back-btn:hover{ border-color:var(--amber); color:#fff; }
+
+/* =================== NIGHT INTRO =================== */
+#intro{ background:#000; }
+.intro-night{
+  position:absolute; top:40%; left:0; right:0; text-align:center;
+  font-size:46px; color:#e7e7e7; letter-spacing:6px;
+}
+.intro-time{
+  position:absolute; top:52%; left:0; right:0; text-align:center;
+  font-size:26px; color:#7a7a7a; letter-spacing:4px;
+}
+
+/* =================== GAMEPLAY OFFICE =================== */
+#play{ background:#000; cursor:default; }
+#office-viewport{ position:absolute; inset:0; overflow:hidden; }
+#office{
+  position:absolute; top:0; bottom:0; left:0;
+  width:160%;                      /* wider than screen -> pannable */
+  transition:transform .25s ease-out;
+  background:
+    radial-gradient(ellipse at 50% 120%, #2a2118 0%, #0a0907 55%, #000 100%);
+}
+
+/* door zones */
+.door-zone{ position:absolute; top:0; bottom:0; width:26%; }
+.door-zone.left{ left:0; }
+.door-zone.right{ right:0; }
+
+.hall-light{
+  position:absolute; top:0; bottom:0; width:100%;
+  background:linear-gradient(180deg,#171510,#0c0b08);
+  opacity:0; transition:opacity .08s;
+}
+.hall-light.on{ opacity:1; background:linear-gradient(180deg,#5a5038,#2a2418); }
+
+.doorway{
+  position:absolute; top:8%; bottom:8%; left:14%; right:14%;
+  border:14px solid #1c1a16;
+  background:linear-gradient(180deg,#0c0b09,#050505);
+  box-shadow:inset 0 0 60px #000;
+}
+.door-blind{ position:absolute; inset:0; overflow:hidden; }
+.monster-peek{
+  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  width:80%; height:92%;
+  background-size:contain; background-repeat:no-repeat; background-position:center bottom;
+  opacity:0; filter:brightness(.5) contrast(1.1);
+  transition:opacity .15s;
+}
+.monster-peek.show{ opacity:1; }
+.hall-light.on ~ .doorway .monster-peek.show{ filter:brightness(.9); }
+
+.door-panel{
+  position:absolute; inset:0; transform:translateY(-101%);
+  transition:transform .18s ease-in;
+  background:repeating-linear-gradient(180deg,#2b2b2b 0 14px,#222 14px 28px);
+  border-bottom:8px solid #444;
+}
+.door-panel.closed{ transform:translateY(0); }
+
+/* door control buttons */
+.door-controls{
+  position:absolute; bottom:14%; left:50%; transform:translateX(-50%);
+  display:flex; gap:14px; z-index:5;
+}
+.dc-btn{
+  width:74px; height:74px; border-radius:8px; border:3px solid #333;
+  background:#2a2a2a; color:#aaa; font-family:inherit; font-size:11px; font-weight:bold;
+  cursor:pointer; letter-spacing:1px;
+}
+.dc-btn:hover{ border-color:#777; }
+.door-btn.active{ background:var(--red); color:#fff; border-color:#ff7a6a; box-shadow:0 0 14px var(--red); }
+.light-btn.active{ background:var(--amber); color:#000; border-color:#ffd98a; box-shadow:0 0 14px var(--amber); }
+
+/* center desk */
+.office-center{ position:absolute; left:26%; right:26%; top:0; bottom:0; }
+.window-back{
+  position:absolute; top:6%; left:8%; right:8%; height:46%;
+  background:linear-gradient(180deg,#15130d 0%,#0a0907 100%);
+  border:10px solid #1b1813; box-shadow:inset 0 0 50px #000;
+}
+.desk{ position:absolute; bottom:0; left:0; right:0; height:42%;
+  background:linear-gradient(180deg,#1a1712,#0c0a07); border-top:4px solid #241f17; }
+.fan{ position:absolute; bottom:30%; left:14%; width:120px; height:120px; }
+.fan-cage{ position:absolute; inset:0; border-radius:50%;
+  border:4px solid #3a3a3a; background:radial-gradient(circle,transparent 60%,rgba(0,0,0,.4)); }
+.fan-blades{
+  position:absolute; inset:14px; border-radius:50%;
+  background:conic-gradient(#555 0 30deg,#2c2c2c 30deg 90deg,#555 90deg 120deg,#2c2c2c 120deg 180deg,#555 180deg 210deg,#2c2c2c 210deg 270deg,#555 270deg 300deg,#2c2c2c 300deg 360deg);
+  animation:spin .12s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+.poster{
+  position:absolute; bottom:46%; right:10%; width:150px; padding:14px 8px;
+  background:#241c10; border:3px solid #3a2e18; color:var(--amber);
+  text-align:center; font-weight:bold; font-size:18px; line-height:1.1;
+  transform:rotate(-2deg);
+}
+.poster span{ font-size:11px; color:#cbb27e; }
+
+/* pan zones */
+.pan-zone{ position:absolute; top:0; bottom:120px; width:14%; z-index:8; }
+.pan-left{ left:0; cursor:w-resize; }
+.pan-right{ right:0; cursor:e-resize; }
+
+/* =================== HUD =================== */
+#hud{
+  position:absolute; top:0; left:0; right:0; z-index:20;
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding:12px 20px; pointer-events:none;
+  text-shadow:1px 1px 3px #000;
+}
+.hud-time{ font-size:26px; font-weight:bold; color:#fff; }
+.hud-power{ text-align:center; font-size:14px; color:#ddd; }
+.power-usage{ margin-top:4px; }
+#usage-bars{ letter-spacing:2px; }
+.hud-night{ font-size:16px; color:#bbb; }
+.usage-bar{ display:inline-block; width:12px; height:16px; margin:0 1px; vertical-align:middle; }
+.usage-bar.on{ background:#3ec43e; }
+.usage-bar.off{ background:#333; }
+.usage-bar.warn.on{ background:#e0a73c; }
+.usage-bar.danger.on{ background:var(--red); }
+
+/* =================== CAMERA MONITOR =================== */
+#cam-flip{
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:240px; height:54px; z-index:25;
+  background:rgba(20,20,20,.85); border:2px solid #444; border-bottom:none;
+  border-radius:14px 14px 0 0; color:#bbb; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-size:15px; letter-spacing:3px;
+}
+#cam-flip:hover{ color:#fff; border-color:var(--amber); }
+.flip-arrow{ font-size:12px; }
+
+#monitor{
+  position:absolute; inset:0; z-index:30; display:none;
+  background:#050505;
+  box-shadow:inset 0 0 200px #000;
+}
+#monitor.open{ display:block; animation:monitoron .18s; }
+@keyframes monitoron{ from{ opacity:.2; transform:scale(1.04);} to{ opacity:1; transform:none;} }
+
+.cam-feed{
+  position:absolute; top:4%; left:4%; right:4%; bottom:4%;
+  background:#0c0c0c; border:3px solid #222; overflow:hidden;
+}
+.cam-image{
+  position:absolute; inset:0;
+  background-size:cover; background-position:center;
+  filter:grayscale(.4) contrast(1.05) brightness(.8);
+}
+.cam-static{
+  position:absolute; inset:0; z-index:3; pointer-events:none; opacity:.5;
+  background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.05) 0 2px,transparent 2px 4px);
+  animation:staticmove .25s steps(6) infinite;
+}
+.cam-label{ position:absolute; top:14px; left:18px; z-index:4; font-size:30px; font-weight:bold; color:#fff; text-shadow:2px 2px 4px #000; }
+.cam-title{ position:absolute; top:54px; left:18px; z-index:4; font-size:16px; color:#cfcfcf; text-shadow:1px 1px 3px #000; }
+.cam-recording{ position:absolute; top:14px; right:18px; z-index:4; color:#fff; font-size:16px; }
+.rec-dot{ display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--red); animation:blink 1s steps(1) infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+/* camera in-feed monster */
+.cam-monster{
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  height:88%; background-size:contain; background-repeat:no-repeat; background-position:bottom center;
+  z-index:2; filter:grayscale(.5) brightness(.8) contrast(1.1);
+}
+
+/* map */
+.cam-map{
+  position:absolute; right:5%; bottom:6%; width:300px; height:300px; z-index:5;
+  background:rgba(10,10,10,.78); border:2px solid #555; padding:8px;
+}
+.map-room{
+  position:absolute; border:1px solid #555; background:rgba(40,40,40,.7);
+  color:#9a9; font-size:10px; text-align:center; cursor:pointer; padding:2px;
+  display:flex; align-items:center; justify-content:center; line-height:1.05;
+}
+.map-room:hover{ background:rgba(80,80,40,.8); color:#fff; }
+.map-room.active{ background:var(--amber); color:#000; font-weight:bold; }
+.map-room.here{ box-shadow:0 0 0 2px var(--red); }
+.map-room.audio{ opacity:.7; }
+.map-office{ position:absolute; border:2px solid var(--amber); background:rgba(80,60,20,.6);
+  color:#fff; font-size:9px; text-align:center; display:flex; align-items:center; justify-content:center; }
+
+/* =================== BLACKOUT / POWER OUT =================== */
+#blackout{ position:absolute; inset:0; z-index:40; background:#000; opacity:0; pointer-events:none; transition:opacity .4s; }
+#blackout.on{ opacity:1; }
+#blackout.musicbox{ animation:none; }
+.eyes{
+  position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+}
+.eyes.show{ display:flex; }
+.eyes div{ width:26px; height:26px; margin:0 30px; border-radius:50%;
+  background:radial-gradient(circle,#fff 0 40%,#aaa 41% 100%); box-shadow:0 0 20px #fff;
+  animation:blink 0.9s steps(1) infinite; }
+
+/* =================== JUMPSCARE =================== */
+#jumpscare{ position:absolute; inset:0; z-index:60; display:none; background:#000; }
+#jumpscare.show{ display:block; }
+#jumpscare .js-img{
+  position:absolute; inset:0; background-size:contain; background-repeat:no-repeat; background-position:center;
+  animation:jsshake .07s infinite;
+}
+@keyframes jsshake{
+  0%{ transform:scale(1.05) translate(0,0); }
+  25%{ transform:scale(1.12) translate(-12px,8px); }
+  50%{ transform:scale(1.06) translate(10px,-10px); }
+  75%{ transform:scale(1.14) translate(-8px,-6px); }
+  100%{ transform:scale(1.05) translate(6px,9px); }
+}
+.js-flash{ position:absolute; inset:0; background:#fff; mix-blend-mode:overlay; animation:blink .06s steps(1) infinite; }
+
+/* fallback monster card (when image file missing) */
+.monster-fallback{
+  width:100%; height:100%;
+  display:flex; align-items:flex-end; justify-content:center;
+  background:radial-gradient(ellipse at 50% 30%, var(--mc,#3a5) 0%, #050505 75%);
+}
+.monster-fallback .mf-name{
+  font-family:"Arial Black",sans-serif; font-size:clamp(20px,6vw,72px); font-weight:900;
+  color:#fff; text-shadow:0 0 24px var(--mc,#3a5),3px 3px 0 #000; padding-bottom:8%;
+  letter-spacing:2px; text-transform:uppercase;
+}
+
+/* =================== WIN / GAME OVER =================== */
+#win{ background:#000; }
+.win-time{ position:absolute; top:36%; left:0; right:0; text-align:center; font-size:60px; color:#fff; letter-spacing:8px; }
+.win-msg{ position:absolute; top:50%; left:0; right:0; text-align:center; font-size:22px; color:var(--amber); }
+#gameover{ background:#000; }
+.menu-btn{
+  position:absolute; left:50%; transform:translateX(-50%);
+  background:#1a1a1a; color:#ddd; border:2px solid #444; padding:14px 40px;
+  font-family:inherit; font-size:18px; cursor:pointer; letter-spacing:2px;
+}
+.menu-btn:hover{ border-color:var(--amber); color:#fff; }
+#win .menu-btn{ top:62%; }
+#gameover .menu-btn:nth-of-type(1){ top:56%; }
+#gameover .menu-btn:nth-of-type(2){ top:68%; }
+.menu-btn.ghost{ background:none; }
+
+/* small screens */
+@media (max-width:680px){
+  .cam-map{ width:200px; height:200px; }
+  .dc-btn{ width:58px; height:58px; }
+}
