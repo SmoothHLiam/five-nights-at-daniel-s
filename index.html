@@ -67,10 +67,6 @@
             <div class="door-blind left-blind"><div class="monster-peek" id="peek-left"></div></div>
             <div class="door-panel left-panel" id="left-door-panel"></div>
           </div>
-          <div class="door-controls left-controls">
-            <button class="dc-btn door-btn" id="btn-left-door"><span>DOOR</span></button>
-            <button class="dc-btn light-btn" id="btn-left-light"><span>LIGHT</span></button>
-          </div>
         </div>
 
         <!-- center desk -->
@@ -89,12 +85,18 @@
             <div class="door-blind right-blind"><div class="monster-peek" id="peek-right"></div></div>
             <div class="door-panel right-panel" id="right-door-panel"></div>
           </div>
-          <div class="door-controls right-controls">
-            <button class="dc-btn door-btn" id="btn-right-door"><span>DOOR</span></button>
-            <button class="dc-btn light-btn" id="btn-right-light"><span>LIGHT</span></button>
-          </div>
         </div>
       </div>
+    </div>
+
+    <!-- door / light controls: fixed screen overlays so panning never moves them -->
+    <div class="door-controls left-controls">
+      <button class="dc-btn door-btn" id="btn-left-door"><span>DOOR</span></button>
+      <button class="dc-btn light-btn" id="btn-left-light"><span>LIGHT</span></button>
+    </div>
+    <div class="door-controls right-controls">
+      <button class="dc-btn door-btn" id="btn-right-door"><span>DOOR</span></button>
+      <button class="dc-btn light-btn" id="btn-right-light"><span>LIGHT</span></button>
     </div>
 
     <!-- pan hint arrows -->

@@ -425,7 +425,9 @@ function drainPower(){
   if(!S || S.over || S.won || S.powerOut) return;
   const u=usageBars();
   S.drain=u;
-  S.power -= u * 0.16;          // tuned so a careful run survives, a sloppy one doesn't
+  // fairer drain: idle barely sips, cameras alone are sustainable,
+  // and only holding doors+lights+cam together burns fast.
+  S.power -= 0.05 + (u-1) * 0.06;
   if(S.power<=0){ S.power=0; enterPowerOut(); }
   renderHUD();
 }

@@ -150,11 +150,12 @@ html,body{
 }
 .door-panel.closed{ transform:translateY(0); }
 
-/* door control buttons */
+/* door control buttons -- fixed screen overlays, always reachable */
 .door-controls{
-  position:absolute; bottom:14%; left:50%; transform:translateX(-50%);
-  display:flex; gap:14px; z-index:5;
+  position:absolute; bottom:24px; display:flex; gap:14px; z-index:15;
 }
+.door-controls.left-controls{ left:24px; }
+.door-controls.right-controls{ right:24px; }
 .dc-btn{
   width:74px; height:74px; border-radius:8px; border:3px solid #333;
   background:#2a2a2a; color:#aaa; font-family:inherit; font-size:11px; font-weight:bold;
