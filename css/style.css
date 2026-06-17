@@ -79,7 +79,12 @@ html,body{
   flex-wrap:wrap; margin-top:34px;
 }
 .cc-card{ width:160px; text-align:center; }
-.cc-name{ font-size:24px; color:#e7e7e7; margin-bottom:12px; letter-spacing:1px; }
+.cc-name{
+  font-size:18px; line-height:1.2; letter-spacing:.5px; color:#e7e7e7;
+  height:2.6em;                 /* room for up to two lines, keeps portraits aligned */
+  display:flex; align-items:flex-end; justify-content:center;
+  margin-bottom:10px; word-break:break-word; text-transform:capitalize;
+}
 .cc-portrait{
   width:160px; height:150px; margin:0 auto;
   background-size:cover; background-position:center top; background-color:#0d0d0d;

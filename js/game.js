@@ -22,9 +22,9 @@
    --------------------------------------------------------------- */
 const CHARACTERS = {
   daniel: { name:"Daniel", role:"dark",  img:"assets/daniel.png", color:"#39c46a" }, // the face of the game
-  bruno:  { name:"Bruno",  role:"left",  img:"assets/bruno.png",  color:"#9aa0a6" },
-  cole:   { name:"Cole",   role:"right", img:"assets/cole.png",   color:"#d98ad0" },
-  jett:   { name:"Jett",   role:"cove",  img:"assets/jett.png",   color:"#e0a73c" },
+  bruno:  { name:"gut genug",     role:"left",  img:"assets/bruno.png",  color:"#9aa0a6" },
+  cole:   { name:"excuse me sir", role:"right", img:"assets/cole.png",   color:"#d98ad0" },
+  jett:   { name:"get in the car",role:"cove",  img:"assets/jett.png",   color:"#e0a73c" },
 };
 
 /* ---------------------------------------------------------------
@@ -673,7 +673,8 @@ function setupFallbacks(){
              <stop offset='75%' stop-color='#050505'/></radialGradient></defs>
            <rect width='600' height='800' fill='url(#g)'/>
            <text x='300' y='720' font-family='Arial Black, sans-serif' font-size='70'
-             font-weight='900' fill='#ffffff' text-anchor='middle'>${c.name.toUpperCase()}</text>
+             font-weight='900' fill='#ffffff' text-anchor='middle'
+             textLength='540' lengthAdjust='spacingAndGlyphs'>${c.name.toUpperCase()}</text>
          </svg>`);
       c.img = `data:image/svg+xml,${svg}`;
     };
